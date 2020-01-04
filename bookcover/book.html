@@ -1,0 +1,37 @@
+{{/* not found image */}}
+{{ $fin := "https://books.google.com/books/content?id=DRlhnQEACAAJ&printsec=frontcover&img=1&zoom=2&source=gbs_api" }}
+
+  {{/* Goodreads and Google Book API query parameters */}}
+    {{ $grIsbn := printf "%s%s" "?format=json&q=" .Params.isbn }}
+    {{ $googIsbn := printf "%s%s" "?q=isbn:" .Params.isbn }}
+
+  {{/* Goodread and Google Book API URLs */}}
+    {{ $grUrlPre := "https://www.goodreads.com/book/auto_complete" }}
+    {{ $googUrlPre := "https://www.googleapis.com/books/v1/volumes" }}
+
+  {{/* Query both API endpoints */}}
+    {{ $grJ := getJSON $grUrlPre $grIsbn }}
+    {{ $googJ := getJSON $googUrlPre $googIsbn }}
+
+  {{/* wrap image in a <figure> */}}
+<figure>
+      {{ if gt (len $grJ) 0 }}
+        {{ $i := index $grJ 0 }}
+
+        {{/* replace Goodreads scale image filename with `.` for "fullsize" */}}
+        {{ $fin := replaceRE "._.*_." "." $i.imageUrl }}
+        <img src="{{ $fin }}" class="book_cover" alt="An image of the cover of the book {{ $i.title }} by {{ $i.author.name }}."/>
+		    <figcaption>{{ $i.title }} - {{ $i.author.name }}</figcaption>
+
+      {{ else if gt ($googJ.totalItems) 0 }}
+
+        {{/* Use Google Books API */}}
+        {{ $i := index $googJ.items 0 }}
+        <img src="{{ $i.volumeInfo.imageLinks.thumbnail }}" class="book_cover" alt="An image of the cover of the book {{ $i.title }} by {{ $i.authors }}."/>/>
+		    <figcaption>{{ $i.title }} - {{ $i.authors }}</figcaption>
+
+      {{/* no image found, leave off figcaption */}}
+      {{ else}}
+        <img src="{{ $fin }}" class="book_cover" alt="An image stating that the cover of the book {{ $i.title }} by {{ $i.author.name }} could not be found."/>
+      {{ end }}
+</figure>
