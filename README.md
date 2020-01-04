@@ -6,4 +6,5 @@ I've been doing more with with Hugo lately both for my own hobby dev site, [shin
 
 ## Shortcodes
 
+- `bandcamp` : Add the Bandcamp album player to a post based on album ID.
 - `bookcover` : Display the cover of a book based on it's ISBN number. Queries GoodReads and Google Books API.
